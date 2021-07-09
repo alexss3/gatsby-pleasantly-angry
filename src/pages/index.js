@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { Link, graphql } from 'gatsby';
 
 // styles
 const pageStyles = {
@@ -126,7 +127,10 @@ const links = [
 ];
 
 // markup
-const IndexPage = () => {
+const IndexPage = ({ data }) => {
+  const clubsEn = data.english.edges;
+  const clubsDa = data.dansk.edges;
+
   return (
     <main style={pageStyles}>
       <title>Pleasantly Angry</title>
@@ -135,8 +139,47 @@ const IndexPage = () => {
         This blog is about being pleasanty angry and nothing else. What did you
         expect?
       </p>
+      <p>
+        Read about me <Link to="/about">here</Link>.
+      </p>
+      {clubsEn.map(({ node }, i) => (
+        <div key={node.id}>
+          <h3>{node.clubName}</h3>
+          <p>Address: {node.address}</p>
+        </div>
+      ))}
+      <hr />
+      {clubsDa.map(({ node }, i) => (
+        <div key={node.id}>
+          <h3>{node.clubName}</h3>
+          <p>Adresse: {node.address}</p>
+        </div>
+      ))}
     </main>
   );
 };
 
 export default IndexPage;
+
+export const pageQuery = graphql`
+  query {
+    english: allContentfulClub(filter: { node_locale: { eq: "en-US" } }) {
+      edges {
+        node {
+          id
+          clubName
+          address
+        }
+      }
+    }
+    dansk: allContentfulClub(filter: { node_locale: { eq: "da-DK" } }) {
+      edges {
+        node {
+          id
+          clubName
+          address
+        }
+      }
+    }
+  }
+`;
